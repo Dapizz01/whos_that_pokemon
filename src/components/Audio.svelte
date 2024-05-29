@@ -1,6 +1,10 @@
 <script>
     import Container from './Container.svelte';
     export let title, path, trigger;
+
+    function check_browser() {
+        return navigator.userAgent.includes('Safari');
+    }
 </script>
 
 <Container>
@@ -10,6 +14,7 @@
             {#if trigger}
                 <audio controls>
                     <source src={path} type="audio/ogg" />
+                    test
                 </audio>
             {/if}
         </div>

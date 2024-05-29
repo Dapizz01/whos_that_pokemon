@@ -1,7 +1,5 @@
 export default class Pokemon_guess {
     constructor(raw_pokemon, raw_pokemon_species, abilities_data) {
-        // @ts-ignore
-        // if (raw_pokemon instanceof Pokemon) {
         this.name = raw_pokemon.name;
         this.height = raw_pokemon.height / 10; // Conversion to meters
         this.weight = raw_pokemon.weight / 10; // Conversion to KG
@@ -22,11 +20,10 @@ export default class Pokemon_guess {
         this.sprite = raw_pokemon.sprites.other['official-artwork']['front_default']; // IDK why it's not official_artwork...
         this.gen = raw_pokemon_species.generation.name;
         this.types = raw_pokemon.types.map((type) => type.type.name);
+        // TODO: Maybe add pokedex source (from which region)
         this.pokedex_entry = raw_pokemon_species.flavor_text_entries
             .filter((entry) => entry.language.name == 'en')
             .pop()
             .flavor_text.replace(new RegExp(raw_pokemon_species.name, 'i'), '<Pokèmon_name>');
-        // Missing ability description
-        // }
     }
 }

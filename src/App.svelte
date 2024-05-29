@@ -21,6 +21,7 @@
     let not_guessed = false;
     let guessed = false;
 
+    // TODO: The mask works, but... most likely there's a better way to handle this
     function free_mask() {
         mask = {
             show_height: true,
@@ -53,10 +54,7 @@
 
     async function setup() {
         if (pokemons_list == undefined || pokemons_list == null) {
-            // Filters out megas and gmaxes
-            pokemons_list = (await P.getPokemonsList()).results
-                .map((entry) => entry.name)
-                .filter((name) => !name.includes('gmax') && !name.includes('mega'));
+            pokemons_list = (await P.getPokemonSpeciesList()).results.map((entry) => entry.name);
         }
         reset_mask();
         not_guessed = false;
@@ -75,7 +73,6 @@
 
         reset_mask();
 
-        // TODO: Ban regional forms (missing pokedex entries), GMax and other weird forms
         if (new_pokemon_name.includes('-'))
             new_pokemon_species_name = new_pokemon_name.split('-')[0];
 
@@ -125,6 +122,7 @@
 </script>
 
 <main>
+    <!-- TODO: Are the stats too helpful? Maybe it's better to put some more obscure hints like catch rate, shape, gender rate, ... -->
     <Header />
     {#await setup_promise}
         Loading...
@@ -142,7 +140,7 @@
             </div>
         {/if}
         <Image path={pokemon.sprite} trigger={mask.show_sprite} />
-        <Counter title="Tries left" timer={tries}></Counter>
+        <Counter title="Tries left" value={tries}></Counter>
         <GenericSingle title="Name" value={pokemon.name} unit_measure="" trigger={mask.show_name} />
         <GenericSingle
             title="Weight"

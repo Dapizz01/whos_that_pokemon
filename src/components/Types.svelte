@@ -1,4 +1,5 @@
 <script>
+    import { typewriter } from '../scripts/typewriter';
     import Container from './Container.svelte';
     export let title, types, trigger;
 </script>
@@ -8,7 +9,9 @@
         <div class="stat">
             <div class="stat-title">{title} #{i + 1}</div>
             {#if trigger}
-                <div class="stat-value">{t}</div>
+                <div class="stat-value" transition:typewriter>{t}</div>
+            {:else}
+                <div class="stat-value">{'█'.repeat(t.length)}</div>
             {/if}
         </div>
     {/each}
