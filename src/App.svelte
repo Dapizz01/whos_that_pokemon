@@ -65,26 +65,21 @@
 
     async function reroll_pokemon() {
         let random_id = Math.floor(Math.random() * pokemons_list.length);
-        const new_pokemon_name = pokemons_list[random_id];
-        let new_pokemon_species_name = new_pokemon_name;
-        not_guessed = false;
-        guessed = false;
-        tries = 3;
+        const pokemon_name = pokemons_list[random_id];
 
-        reset_mask();
-
-        if (new_pokemon_name.includes('-'))
-            new_pokemon_species_name = new_pokemon_name.split('-')[0];
-
-        let new_pokemon = await P.getPokemonByName(new_pokemon_name);
-        let new_pokemon_species = await P.getPokemonSpeciesByName(new_pokemon_species_name);
-        console.log(new_pokemon);
-        console.log(new_pokemon_species);
+        let raw_pokemon_species = await P.getPokemonSpeciesByName(pokemon_name);
+        // Sometimes the Pokèmon name on the API isn't the name of the species (ex: wishiwashi),
+        // so the default form is chosen
+        let raw_pokemon = await P.getPokemonByName(
+            raw_pokemon_species.varieties.filter((variety) => variety.is_default)[0].pokemon.name,
+        );
+        console.log(raw_pokemon);
+        console.log(raw_pokemon_species);
         let abilities_data = await P.resource(
-            new_pokemon.abilities.map((ability) => ability.ability.url),
+            raw_pokemon.abilities.map((ability) => ability.ability.url),
         );
         console.log(abilities_data);
-        pokemon = new Pokemon_guess(new_pokemon, new_pokemon_species, abilities_data);
+        pokemon = new Pokemon_guess(raw_pokemon, raw_pokemon_species, abilities_data);
         console.log(pokemon);
         return pokemon;
     }
@@ -139,32 +134,49 @@
                 <button on:click={handle_reset}>Retry</button>
             </div>
         {/if}
-        <Image path={pokemon.sprite} trigger={mask.show_sprite} />
-        <Counter title="Tries left" value={tries}></Counter>
-        <GenericSingle title="Name" value={pokemon.name} unit_measure="" trigger={mask.show_name} />
-        <GenericSingle
-            title="Weight"
-            value={pokemon.weight}
-            unit_measure="kg"
-            trigger={mask.show_weight}
-        />
-        <GenericSingle
-            title="Height"
-            value={pokemon.height}
-            unit_measure="m"
-            trigger={mask.show_height}
-        />
-        <GenericSingle
-            title="Generation"
-            value={pokemon.gen}
-            unit_measure=""
-            trigger={mask.show_gen}
-        />
-        <Abilities title="Ability" abilities={pokemon.abilities} trigger={mask.show_abilities} />
-        <Types title="Type" types={pokemon.types} trigger={mask.show_types} />
-        <Audio title="Cry" path={pokemon.cry} trigger={mask.show_cry} />
-        <Text title="Pokedex entry" text={pokemon.pokedex_entry} trigger={mask.show_entry} />
-        <Stats title="Stats" vals={pokemon.stats} trigger={mask.show_stats} />
+        <!-- class="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-5" -->
+        <div id="info_container">
+            <Image path={pokemon.sprite} trigger={mask.show_sprite} />
+            <Counter title="Tries left" value={tries}></Counter>
+            <GenericSingle
+                title="Name"
+                value={pokemon.name}
+                unit_measure=""
+                trigger={mask.show_name}
+            />
+            <GenericSingle
+                title="Weight"
+                value={pokemon.weight}
+                unit_measure="kg"
+                trigger={mask.show_weight}
+            />
+            <GenericSingle
+                title="Height"
+                value={pokemon.height}
+                unit_measure="m"
+                trigger={mask.show_height}
+            />
+            <GenericSingle
+                title="Generation"
+                value={pokemon.gen}
+                unit_measure=""
+                trigger={mask.show_gen}
+            />
+            <Abilities
+                title="Ability"
+                abilities={pokemon.abilities}
+                trigger={mask.show_abilities}
+            />
+            <Types title="Type" types={pokemon.types} trigger={mask.show_types} />
+            <Audio title="Cry" path={pokemon.cry} trigger={mask.show_cry} />
+            <Text
+                title="Pokedex entry"
+                text={pokemon.pokedex_entry.text}
+                desc={'Source: Pokèmon ' + pokemon.pokedex_entry.source}
+                trigger={mask.show_entry}
+            />
+            <!--Stats title="Stats" vals={pokemon.stats} trigger={mask.show_stats} /-->
+        </div>
 
         <!-- TODO: Fix style of Select -->
         <Select

@@ -1,6 +1,6 @@
 export default class Pokemon_guess {
     constructor(raw_pokemon, raw_pokemon_species, abilities_data) {
-        this.name = raw_pokemon.name;
+        this.name = raw_pokemon_species.name;
         this.height = raw_pokemon.height / 10; // Conversion to meters
         this.weight = raw_pokemon.weight / 10; // Conversion to KG
         this.cry = raw_pokemon.cries.latest;
@@ -23,7 +23,15 @@ export default class Pokemon_guess {
         // TODO: Maybe add pokedex source (from which region)
         this.pokedex_entry = raw_pokemon_species.flavor_text_entries
             .filter((entry) => entry.language.name == 'en')
-            .pop()
-            .flavor_text.replace(new RegExp(raw_pokemon_species.name, 'i'), '<Pokèmon_name>');
+            .map((entry) => {
+                return {
+                    text: entry.flavor_text.replace(
+                        new RegExp(raw_pokemon_species.name, 'i'),
+                        '(This Pokèmon)',
+                    ),
+                    source: entry.version.name,
+                };
+            })
+            .pop();
     }
 }
